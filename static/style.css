@@ -1,0 +1,68 @@
+/* =====================================================
+   LANDING PAGE (PREVIOUS GLASS STYLE – IMPROVED)
+===================================================== */
+body.landing {
+    background:
+        linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)),
+        url("/static/bg.jpg");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    min-height: 100vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Glass container */
+.hero {
+    text-align: center;
+    max-width: 800px;
+
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px);
+
+    padding: 50px;
+    border-radius: 20px;
+
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+/* Title */
+.hero h1 {
+    font-size: 38px;
+    margin-bottom: 15px;
+}
+
+/* Subtitle */
+.subtitle {
+    font-size: 18px;
+    opacity: 0.9;
+    margin-bottom: 25px;
+}
+
+/* File input */
+.upload-form input[type="file"] {
+    margin-bottom: 15px;
+}
+
+/* Button */
+.upload-form button {
+    padding: 12px 22px;
+    border-radius: 10px;
+    border: none;
+    font-weight: bold;
+    font-size: 16px;
+
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
+    color: white;
+
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.upload-form button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(99, 102, 241, 0.5);
+}

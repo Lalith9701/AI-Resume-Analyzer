@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Analysis Result</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+<div class="container">
+
+    <h1>Resume Score: {{ score }}%</h1>
+
+    <!-- ✅ Progress Bar -->
+    <div class="progress">
+        <div class="progress-bar" style="width: {{ score }}%;">
+            {{ score }}%
+        </div>
+    </div>
+
+    <!-- ✅ Skills Found -->
+    <h2>Skills Found</h2>
+    <div class="badges">
+        {% for skill in found_skills %}
+            <span class="badge found">{{ skill }}</span>
+        {% endfor %}
+    </div>
+
+    <!-- ✅ Missing Skills -->
+    <h2>Missing Skills</h2>
+    <div class="badges">
+        {% for skill in missing_skills %}
+            <span class="badge missing">{{ skill }}</span>
+        {% endfor %}
+    </div>
+
+    <!-- ✅ Rule Suggestions -->
+    <h2>Suggestions</h2>
+    <div class="suggestions">
+        {% for s in suggestions %}
+            <p>{{ s }}</p>
+        {% endfor %}
+    </div>
+
+    <!-- ✅ Gemini Suggestions -->
+    <h2>🤖 AI Suggestions</h2>
+    <div class="suggestions">
+        <pre>{{ ai_feedback }}</pre>
+    </div>
+
+    <a href="/">⬅ Analyze Another Resume</a>
+
+</div>
+</body>
+</html>
