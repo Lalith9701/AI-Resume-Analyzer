@@ -2,9 +2,7 @@ import os
 from flask import Flask, render_template, request
 import PyPDF2
 from skills import SKILLS_DB
-
-# Gemini new SDK
-from google import genai
+import google.generativeai as genai
 from dotenv import load_dotenv
 
 # ---------------------------------------
@@ -13,10 +11,13 @@ from dotenv import load_dotenv
 load_dotenv()
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
-print("KEY LOADED:", GEMINI_API_KEY)  # debug
+if not GEMINI_API_KEY:
+    print("WARNING: GEMINI_API_KEY not found in .env file!")
+else:
+    print("KEY LOADED successfully (not showing full key for security)")
 
-# Create Gemini client
-client = genai.Client(api_key=GEMINI_API_KEY)
+# Configure Gemini
+genai.configure(api_key=GEMINI_API_KEY)
 
 # ---------------------------------------
 # Flask setup
@@ -25,6 +26,9 @@ app = Flask(__name__)
 UPLOAD_FOLDER = "uploads"
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
+# Create uploads folder if missing
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
 
 # ---------------------------------------
 # Extract text from PDF
@@ -37,13 +41,12 @@ def extract_text_from_pdf(filepath):
             for page in reader.pages:
                 content = page.extract_text()
                 if content:
-                    text += content
+                    text += content + "\n"
     except Exception as e:
-        print("PDF ERROR:", e)
+        print("PDF Extraction ERROR:", str(e))
         text = ""
 
     return text.lower()
-
 
 # ---------------------------------------
 # Find skills
@@ -55,7 +58,6 @@ def find_skills(resume_text):
             found.append(skill)
     return found
 
-
 # ---------------------------------------
 # Score calculation
 # ---------------------------------------
@@ -64,43 +66,61 @@ def calculate_score(found_skills):
         return 0
     return min(int((len(found_skills) / len(SKILLS_DB)) * 100), 100)
 
-
 # ---------------------------------------
-# Gemini AI suggestions (FIXED VERSION)
+# Gemini AI suggestions
 # ---------------------------------------
 def get_ai_suggestions(resume_text):
     try:
         if not resume_text.strip():
             return "Resume text is empty. Cannot analyze."
 
-        prompt = f"""
-        Review this resume and give short bullet point suggestions
-        to improve ATS score, clarity, impact and missing skills.
+        # Truncate to avoid token limit & high cost (~4000 chars ~ 1000 tokens)
+        truncated_text = resume_text[:4000]
 
-        Resume:
-        {resume_text}
+        prompt = f"""
+        You are an expert resume reviewer and ATS specialist.
+        Review the following resume text and provide short, actionable bullet-point suggestions 
+        to improve:
+        - ATS compatibility (keywords, formatting tips)
+        - Clarity and impact
+        - Quantifiable achievements
+        - Missing or weak skills/sections
+
+        Be concise, professional, and constructive.
+        Focus only on improvements — do not rewrite the full resume.
+
+        Resume text:
+        {truncated_text}
         """
 
-        response = client.models.generate_content(
-            model="gemini-2.0-flash",
+        # Use a current stable fast model (as of Feb 2026)
+        response = genai.generate_content(
+            model="gemini-2.5-flash",   # ← Recommended fast & capable model
             contents=prompt,
         )
 
-        return response.text
+        return response.text.strip()
 
     except Exception as e:
-        # 🔥 Graceful fallback (IMPORTANT)
+        error_msg = str(e)
+        print("Gemini API Error:", error_msg)
+
+        if "API key" in error_msg or "authentication" in error_msg.lower():
+            return "⚠ Gemini API key issue — check your .env file and key validity."
+
+        if "model" in error_msg.lower() and "not found" in error_msg.lower():
+            return "⚠ Model not available — try updating to a newer model name."
+
+        # Graceful fallback
         return (
-            "⚠ AI suggestions are temporarily unavailable due to API limits.\n\n"
-            "Meanwhile, consider these improvements:\n"
-            "- Add measurable achievements (numbers, impact)\n"
-            "- Use strong action verbs\n"
-            "- Tailor skills to the job description\n"
-            "- Improve formatting for ATS compatibility\n"
-            "- Add relevant projects or internships"
+            "⚠ AI suggestions temporarily unavailable (API error or rate limit).\n\n"
+            "Quick manual tips:\n"
+            "• Use action verbs (Led, Developed, Increased)\n"
+            "• Quantify achievements (e.g., 'Boosted sales 35%')\n"
+            "• Include keywords from job descriptions\n"
+            "• Avoid tables/graphics in PDF for ATS\n"
+            "• Add projects, certifications, GitHub links"
         )
-
-
 
 # ---------------------------------------
 # Home
@@ -109,19 +129,18 @@ def get_ai_suggestions(resume_text):
 def home():
     return render_template("index.html")
 
-
 # ---------------------------------------
 # Analyze resume
 # ---------------------------------------
 @app.route("/analyze", methods=["POST"])
 def analyze():
     if "resume" not in request.files:
-        return "No file uploaded"
+        return "No file part in request", 400
 
     file = request.files["resume"]
 
     if file.filename == "":
-        return "No selected file"
+        return "No file selected", 400
 
     # Save file
     filepath = os.path.join(app.config["UPLOAD_FOLDER"], file.filename)
@@ -129,7 +148,10 @@ def analyze():
 
     # Extract text
     resume_text = extract_text_from_pdf(filepath)
-    print("TEXT LENGTH:", len(resume_text))  # debug
+    print("Extracted text length:", len(resume_text))  # debug
+
+    if not resume_text.strip():
+        return "Could not extract text from PDF. Try a different file.", 400
 
     # Find skills
     found_skills = find_skills(resume_text)
@@ -138,33 +160,31 @@ def analyze():
     # Score
     score = calculate_score(found_skills)
 
-    # ---------------------------------------
-    # Rule suggestions
-    # ---------------------------------------
+    # Rule-based suggestions
     suggestions = []
 
     if score < 40:
-        suggestions.append("Add more technical skills.")
+        suggestions.append("Your skill match is low — add more relevant technical skills from job descriptions.")
     elif score < 70:
-        suggestions.append("Improve resume by adding more relevant tools.")
+        suggestions.append("Good start — strengthen by adding more tools/technologies and projects.")
     else:
-        suggestions.append("Strong profile. Add measurable achievements.")
+        suggestions.append("Strong skill match! Focus on quantifying achievements and tailoring further.")
 
-    if "project" not in resume_text:
-        suggestions.append("Add project experience.")
+    if "project" not in resume_text and "projects" not in resume_text:
+        suggestions.append("Add a Projects section with descriptions and technologies used.")
 
-    if "internship" not in resume_text:
-        suggestions.append("Add internship details.")
+    if "internship" not in resume_text and "experience" not in resume_text:
+        suggestions.append("Include internships, freelance work, or volunteer experience if applicable.")
 
     if not suggestions:
-        suggestions.append("Improve formatting and readability.")
+        suggestions.append("Overall solid — improve formatting, add metrics, and proofread for typos.")
 
-    # ---------------------------------------
-    # Gemini suggestions
-    # ---------------------------------------
+    # Gemini AI feedback
     ai_feedback = get_ai_suggestions(resume_text)
 
-    # Render
+    # Clean up uploaded file (optional but good practice)
+    # os.remove(filepath)  # Uncomment if you don't want to keep files
+
     return render_template(
         "result.html",
         score=score,
@@ -174,12 +194,8 @@ def analyze():
         ai_feedback=ai_feedback,
     )
 
-
 # ---------------------------------------
 # Run server
 # ---------------------------------------
 if __name__ == "__main__":
-    if not os.path.exists(UPLOAD_FOLDER):
-        os.makedirs(UPLOAD_FOLDER)
-
     app.run(debug=True)

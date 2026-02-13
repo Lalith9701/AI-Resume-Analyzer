@@ -1,22 +1,142 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>AI Resume Analyzer</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>AI Resume Analyzer – Optimize for ATS & Land More Interviews</title>
     <link rel="stylesheet" href="/static/style.css">
+    <!-- You can later add Google Fonts etc. -->
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --text: #1e293b;
+            --light-bg: #f8fafc;
+            --gray: #64748b;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: var(--light-bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        .hero-wrapper {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem 1rem;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        .title {
+            font-size: 3.2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+        .subtitle {
+            font-size: 1.35rem;
+            color: var(--gray);
+            margin-bottom: 2.5rem;
+            max-width: 620px;
+        }
+        .features {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        .feature {
+            background: white;
+            padding: 1.5rem 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+            width: 100%;
+            max-width: 320px;
+            text-align: left;
+        }
+        .feature h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+            color: var(--primary);
+        }
+        .upload-card {
+            background: white;
+            padding: 2.5rem 2rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 35px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 480px;
+            margin: 1rem auto;
+        }
+        .upload-card input[type="file"] {
+            display: block;
+            width: 100%;
+            margin-bottom: 1.5rem;
+            padding: 0.8rem;
+            border: 2px dashed #cbd5e1;
+            border-radius: 8px;
+            background: #f8fafc;
+        }
+        .upload-card button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.15rem;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.2s;
+            width: 100%;
+        }
+        .upload-card button:hover {
+            background: var(--primary-dark);
+        }
+        @media (max-width: 640px) {
+            .title { font-size: 2.6rem; }
+            .subtitle { font-size: 1.2rem; }
+            .features { flex-direction: column; align-items: center; }
+        }
+    </style>
 </head>
-
-<body class="landing">
+<body>
 
 <div class="hero-wrapper">
 
-    <h1 class="title">🚀 AI Resume Analyzer</h1>
+    <h1 class="title">AI Resume Analyzer</h1>
+    
     <p class="subtitle">
-        Instant ATS score, skill gap detection, and AI career insights.
+        Get an instant ATS compatibility score, detect missing skills, and receive actionable AI-powered career recommendations — in seconds.
     </p>
 
+    <div class="features">
+        <div class="feature">
+            <h3>ATS Score & Fixes</h3>
+            <p>Know exactly why your resume might be getting rejected by applicant tracking systems — with clear improvement suggestions.</p>
+        </div>
+        <div class="feature">
+            <h3>Skill Gap Analysis</h3>
+            <p>Compare your skills against real job postings and discover exactly what to add to match top roles in your field.</p>
+        </div>
+        <div class="feature">
+            <h3>AI Career Insights</h3>
+            <p>Personalized feedback, keyword optimization, and next-step recommendations tailored to your experience level and industry.</p>
+        </div>
+    </div>
+
     <form action="/analyze" method="post" enctype="multipart/form-data" class="upload-card">
-        <input type="file" name="resume" required>
-        <button type="submit">Analyze Resume</button>
+        <input type="file" name="resume" accept=".pdf,.doc,.docx" required>
+        <button type="submit">Analyze My Resume</button>
     </form>
 
 </div>
