@@ -1,4 +1,4 @@
-# skills.py
+
 
 SKILLS_DB = [
     "python", "java", "c", "c++", "html", "css", "javascript",
