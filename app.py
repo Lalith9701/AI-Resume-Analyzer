@@ -14,7 +14,7 @@ if not GEMINI_API_KEY:
 else:
     print("KEY LOADED successfully (not showing full key for security)")
 
-# Configure Gemini
+
 genai.configure(api_key=GEMINI_API_KEY)
 
 # ---------------------------------------
