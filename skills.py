@@ -1,4 +1,4 @@
-
+#skills page
 
 SKILLS_DB = [
     "python", "java", "c", "c++", "html", "css", "javascript",
