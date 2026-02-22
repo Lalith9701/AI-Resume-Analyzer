@@ -17,9 +17,7 @@ else:
 
 genai.configure(api_key=GEMINI_API_KEY)
 
-# ---------------------------------------
-# Flask setup
-# ---------------------------------------
+
 app = Flask(__name__)
 UPLOAD_FOLDER = "uploads"
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
@@ -28,9 +26,7 @@ app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
-# ---------------------------------------
-# Extract text from PDF
-# ---------------------------------------
+
 def extract_text_from_pdf(filepath):
     text = ""
     try:
