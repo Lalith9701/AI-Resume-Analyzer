@@ -3,7 +3,7 @@
 SKILLS_DB = [
     "python", "java", "c", "c++", "html", "css", "javascript",
     "flask", "django", "sql", "mysql", "mongodb",
-    "machine learning", "deep learning", "nlp",
+    "machine learning", "deep learning", "nlp", "pandas",
     "data analysis", "pandas", "numpy",
     "aws", "docker", "kubernetes", "git"
 ]
