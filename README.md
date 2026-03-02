@@ -173,4 +173,4 @@ Aspiring Software / AI Engineer
 
 # ⭐ Support
 
-If you like this project, please give it a star ⭐.
+If you like this project, please give it a star ⭐..
