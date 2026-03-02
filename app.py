@@ -23,7 +23,7 @@ app = Flask(__name__)
 UPLOAD_FOLDER = "uploads"
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
-# Create uploads folder if missing
+
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
@@ -43,9 +43,7 @@ def extract_text_from_pdf(filepath):
 
     return text.lower()
 
-# ---------------------------------------
-# Find skills
-# ---------------------------------------
+
 def find_skills(resume_text):
     found = []
     for skill in SKILLS_DB:
@@ -69,7 +67,7 @@ def get_ai_suggestions(resume_text):
         if not resume_text.strip():
             return "Resume text is empty. Cannot analyze."
 
-        # Truncate to avoid token limit & high cost (~4000 chars ~ 1000 tokens)
+        
         truncated_text = resume_text[:4000]
 
         prompt = f"""
